@@ -1,0 +1,63 @@
+# My Portfolio — Gabriel Fonseca
+
+A single-page portfolio built from scratch with Next.js, React, Tailwind CSS, and Three.js. The default language is Brazilian Portuguese.
+
+## Run locally
+
+```sh
+npm ci
+npm run dev
+```
+
+Open http://127.0.0.1:3000.
+
+For a production preview:
+
+```sh
+npm run build
+npm run preview
+```
+
+The production build exports to `out/`, which can be served by a static host. No API keys or server are required for the current experience. Root `index.html` files are generated in `out/`; edit the React source in `app/`.
+
+## Included
+
+- Three-second GF monogram introduction with circular ripples.
+- Three.js particles that assemble into Gabriel Fonseca, react to the cursor, and float above an animated ocean. A text fallback remains available without WebGL.
+- Silent, local project showcase video behind the hero.
+- Fixed glass navigation, magnetic logo and links, and a section-aware glowing underline.
+- Separate biography and technology views, based on the supplied professional profile.
+- Portuguese, English, Spanish, Japanese, Russian, French, German, and Italian interface and biography translations. Technology names and project concept names remain proper names.
+- Four illustrated color themes, a motion toggle, and persisted local preferences. System reduced-motion preferences are respected.
+- Twenty clearly labeled project concepts, initially six visible, with category filters, show more/less, and native image dialogs with keyboard navigation.
+- Responsive contact form with browser validation and a copyable message.
+- Local fonts and SVG artwork; no runtime translation service, analytics, or third-party image requests.
+
+## Add real contact details and case studies
+
+1. Set the public email and any profile URLs in `app/site.config.js`. An empty email prepares a copyable message and clearly explains that delivery is not configured. With an email, the form opens the visitor’s email application; the visitor sends it themselves. It does not claim to send mail from the website.
+2. Replace numbered concept previews in `public/projects/01.svg` through `20.svg`. If your supplied images use JPG, PNG, or WebP, update each project’s `image` property in `app/content.js`.
+3. Update project names, descriptions, and technology tags in `app/content.js` with verified case study information. The current previews are illustrative examples of the profile’s capabilities, not fabricated client work. Keep or update their concept labels accordingly.
+4. Replace `public/project-reel.webm` with a real showcase, or regenerate it from the first six previews with `node scripts/create-reel.mjs`.
+
+The supplied reference screenshots were available as visual guidance; separate numbered project assets and public contact details were not supplied.
+
+## Source map
+
+| File | Purpose |
+| --- | --- |
+| `app/page.jsx` | Layout and client-side interactions |
+| `app/OceanScene.jsx` | Three.js particle name, stars, and ocean |
+| `app/globals.css` | Tailwind entry, design, themes, and responsiveness |
+| `app/content.js` | Eight languages, project data, and technology groups |
+| `app/site.config.js` | Public contact and video configuration |
+| `public/projects/` | Twenty numbered concept previews |
+| `public/themes/` | Four theme selection images |
+
+## Verification
+
+`npm run build` checks the production compilation and static export. To run the interaction checks, start the production preview, then run `node scripts/qa.mjs`. That script uses installed Google Chrome on Windows through the DevTools protocol and writes screenshots and a report into ignored `.preview/`.
+
+The browser checks cover the intro, Three.js, video and font loading, all eight languages, four themes, project expansion and filtering, image dialogs, contact preparation, section navigation, mobile settings, reduced motion, preference persistence, and overflow at widths from 320 to 1920 pixels.
+
+The project remains local; it has not been deployed or published.
