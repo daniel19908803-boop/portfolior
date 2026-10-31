@@ -143,8 +143,8 @@ export default function Portfolio(){
         {!videoError&&<video className="project-reel" autoPlay muted loop playsInline preload="none" poster="/projects/03.svg" aria-hidden="true" onError={()=>setVideoError(true)}><source src={siteConfig.projectVideo} type="video/webm"/></video>}
         <div className="hero-glow"/><div className="hero-orbit orbit-a"/><div className="hero-orbit orbit-b"/>
         {!intro&&<OceanScene motion={motion} onReady={onSceneReady}/>}
-        <div className="hero-topline"><span className="availability"><i/>{c.available}</span><p>{c.location}</p></div>
-        <div className="hero-copy"><p className="hero-kicker">INDEPENDENT SOFTWARE ENGINEER</p><h1 className={sceneReady?'sr-only':'hero-fallback'}>Gabriel Fonseca<span>.</span></h1></div>
+        <div className="hero-topline"><span className="availability"><i/>{c.available}</span><p className="hero-location">{c.location}</p><p className="hero-kicker">INDEPENDENT SOFTWARE ENGINEER</p></div>
+        <div className="hero-copy"><h1 className={sceneReady?'sr-only':'hero-fallback'}>Gabriel Fonseca<span>.</span></h1></div>
         <div className="hero-subcopy"><div className="role-line" aria-live="off"><span key={role}>{c.role[role]}</span><i/></div><p>{c.hero}</p><div className="hero-actions"><Magnetic as="a" href="#projetos" className="primary-button" disabled={!motion}>{c.work}<ArrowUpRight size={17}/></Magnetic><a href="#contato" className="quiet-button">{c.talk}<ArrowRight size={15}/></a></div></div>
         <div className="hero-bottom"><span className="hero-index"><b>01</b><span>/</span>04</span><a href="#sobre" className="scroll-cue"><span>{c.scroll}</span><ArrowDown size={15}/></a><span className="local-time"><i/>{time}<span>UTC−3 · {c.brazil}</span></span></div>
       </section>
