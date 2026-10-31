@@ -30,17 +30,17 @@ The production build exports to `out/`, which can be served by a static host. No
 - Portuguese, English, Spanish, Japanese, Russian, French, German, and Italian interface and biography translations. Project descriptions are available in Portuguese and English; other locales display English descriptions. Technology and project names remain proper names.
 - Four illustrated color themes, a motion toggle, and persisted local preferences. System reduced-motion preferences are respected.
 - Twenty projects matched in order to the seven supplied project reference screenshots, initially six visible, with category filters and show more/less. Native dialogs display the original uncropped images, with keyboard navigation and full-resolution links.
-- Responsive contact form with browser validation and a copyable message.
+- Responsive contact form with browser validation, spam protection, and email delivery through Netlify Forms.
 - Local fonts, original project images, and optimized WebP card thumbnails; no runtime translation service, analytics, or third-party image requests.
 
 ## Contact details and project content
 
-1. Set the public email and any profile URLs in `app/site.config.js`. An empty email prepares a copyable message and clearly explains that delivery is not configured. With an email, the form opens the visitor’s email application; the visitor sends it themselves. It does not claim to send mail from the website.
+1. The contact form submits to Netlify Forms and sends notifications to `gabriel.fonseca2000@outlook.com`. The visitor’s email is the reply-to address. Manage delivery recipients in Netlify under **Forms → Submission notifications**; `app/site.config.js` controls the public email link and profile URLs. The static form definition is in `public/contact-form.html`. Form detection must remain enabled in Netlify. Submission errors preserve the entered message and offer a direct email link; success appears only after Netlify accepts the submission.
 2. Project images in `public/projects/01.png` through `20.png` (with original JPG/WebP extensions where applicable) match the card order in `project1.jpg` through `project7.jpg`. The Instagram Automation image is included as project 05. Cards load optimized WebP versions from `public/projects/thumbnails/`; clicking loads the original file.
 3. Update project names, descriptions, status, technology tags, and image paths in `app/projects.js`. The reference screenshots establish the project titles and their LIVE, GITHUB, or PRIVATE labels. Private source code is identified in the dialog; no project URLs are inferred from badge labels.
 4. Replace `public/project-reel.webm` with a real showcase, or regenerate it from the first six previews with `node scripts/create-reel.mjs`.
 
-The project gallery uses the supplied assets from the adjacent `ref_image/project image` folder. Public contact details remain unconfigured.
+The project gallery uses the supplied assets from the adjacent `ref_image/project image` folder. The public contact email is `gabriel.fonseca2000@outlook.com`.
 
 ## Source map
 
@@ -59,7 +59,7 @@ The project gallery uses the supplied assets from the adjacent `ref_image/projec
 
 `npm run build` checks the production compilation and static export. To run the interaction checks, start the production preview, then run `node scripts/qa.mjs`. That script uses installed Google Chrome on Windows through the DevTools protocol and writes screenshots and a report into ignored `.preview/`.
 
-The browser checks cover the intro, Three.js, video and font loading, all eight languages, four themes, project expansion and filtering, image dialogs, contact preparation, section navigation, mobile settings, reduced motion, preference persistence, and overflow at widths from 320 to 1920 pixels.
+The browser checks cover the intro, Three.js, video and font loading, all eight languages, four themes, project expansion and filtering, image dialogs, contact validation, submission encoding, loading, failure and retry, section navigation, mobile settings, reduced motion, preference persistence, and overflow at widths from 320 to 1920 pixels. Contact requests are intercepted during browser QA, so checks do not send emails. Set `QA_BASE_URL` to test a preview on a different port.
 
 ## Netlify deployment
 

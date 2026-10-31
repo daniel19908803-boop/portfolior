@@ -3,11 +3,12 @@ import {browser} from './browser.mjs';
 const b=await browser();const {call,evaluate}=b;
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const results=[];
+const baseURL=process.env.QA_BASE_URL||'http://127.0.0.1:3000';
 const assert=(value,label)=>{if(!value)throw new Error('FAIL: '+label);results.push(label);console.log('PASS: '+label);};
 const shot=async name=>{await sleep(350);const {data}=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});await writeFile('.preview/'+name+'.png',Buffer.from(data,'base64'));};
 try{
   await call('Emulation.setDeviceMetricsOverride',{width:1440,height:960,deviceScaleFactor:1,mobile:false});
-  await call('Page.navigate',{url:'http://127.0.0.1:3000/'});
+  await call('Page.navigate',{url:baseURL+'/'});
   for(let i=0;i<100;i++){if(await evaluate('document.readyState==="complete" && !!document.querySelector(".splash")'))break;await sleep(100);}
   await shot('intro');await sleep(5700);
   await evaluate('document.fonts.ready');
@@ -51,15 +52,21 @@ try{
     await evaluate(`document.documentElement.style.scrollBehavior='auto';document.getElementById('${id}').scrollIntoView({behavior:'instant'})`);await sleep(800);await shot('desktop-'+id);
   }
   assert(await evaluate('document.querySelector(".main-nav a.active").getAttribute("href")==="#contato"'),'Navigation tracks the current section');
+  // Intercept only form submissions: browser QA must never send real email.
+  await evaluate(`window.originalFetch=window.fetch;window.contactRequests=[];window.fetch=(url,options)=>{if(url!=='/contact-form.html')return window.originalFetch(url,options);window.contactRequests.push({url,...options});return new Promise(resolve=>{window.resolveContact=resolve;});};document.querySelector("form").requestSubmit()`);
+  assert(await evaluate('window.contactRequests.length===0 && !document.querySelector(".contact-success")'),'Required fields prevent an empty submission');
+  await evaluate('document.querySelector("#contact-name").value="QA Visitor & Team";document.querySelector("#contact-email").value="qa+portfolio@example.com";document.querySelector("#contact-message").value="Olá! I want to discuss a project & its timeline.";document.querySelector("form").requestSubmit()');await sleep(100);
+  assert(await evaluate('document.querySelector(".submit-button").disabled && document.querySelector("form").getAttribute("aria-busy")==="true"'),'Sending state disables duplicate submissions');
   await evaluate('document.querySelector("form").requestSubmit()');
-  assert(await evaluate('!!document.querySelector("form") && !document.querySelector(".prepared-message")'),'Required fields prevent preparing an empty message');
-  await evaluate('document.querySelector("#contact-name").value="QA Visitor";document.querySelector("#contact-email").value="qa@example.com";document.querySelector("#contact-message").value="I want to discuss a new project and a delivery timeline.";document.querySelector("form").requestSubmit()');
-  assert(await evaluate('!!document.querySelector(".prepared-message") && document.querySelector(".prepared-message textarea").value.includes("QA Visitor")'),'Form prepares the real visitor message');
-  assert(await evaluate('document.querySelector(".prepared-message").textContent.includes("ainda não foi configurado")'),'Contact clearly discloses missing delivery configuration');
-  await call('Browser.grantPermissions',{origin:'http://127.0.0.1:3000',permissions:['clipboardReadWrite','clipboardSanitizedWrite']});
-  await evaluate('document.querySelector(".prepared-actions .primary-button").click()');await sleep(150);
-  assert(await evaluate('navigator.clipboard.readText().then(text=>text.includes("QA Visitor") && text.includes("delivery timeline"))'),'Copy message writes the visitor’s actual brief to the clipboard');
-  await evaluate('document.querySelector(".prepared-actions .quiet-button").click()');
+  assert(await evaluate('window.contactRequests.length===1'),'Repeated submits do not send duplicate requests');
+  assert(await evaluate(`(()=>{const r=window.contactRequests[0],data=new URLSearchParams(r.body);return r.method==='POST'&&r.headers['Content-Type']==='application/x-www-form-urlencoded'&&data.get('form-name')==='contact'&&data.get('name')==='QA Visitor & Team'&&data.get('email')==='qa+portfolio@example.com'&&data.get('message').startsWith('Olá!')&&data.get('bot-field')==='';})()`),'Form encodes all visitor fields and Netlify metadata correctly');
+  assert(await evaluate('getComputedStyle(document.querySelector("[name=bot-field]").parentElement).display==="none"'),'Spam honeypot stays hidden');
+  await evaluate('window.resolveContact(new Response("Unavailable",{status:503}))');await sleep(100);
+  assert(await evaluate('!!document.querySelector("[role=alert]") && !document.querySelector(".contact-success") && document.querySelector("#contact-name").value==="QA Visitor & Team" && !document.querySelector(".submit-button").disabled'),'Failed submissions keep the message and allow retry');
+  await evaluate('document.querySelector("form").requestSubmit()');await sleep(100);
+  await evaluate('window.resolveContact(new Response("Accepted",{status:200}))');await sleep(100);
+  assert(await evaluate('!!document.querySelector(".contact-success") && document.querySelector(".contact-success").textContent.includes("Mensagem enviada")'),'Success appears only after the server accepts the message');
+  await evaluate('window.fetch=window.originalFetch;document.querySelector(".prepared-actions .quiet-button").click()');await sleep(100);
   assert(await evaluate('!!document.querySelector("form")'),'Contact returns to the form');
   for(const width of [320,360,390,560,768,1024,1440,1920]){
     await call('Emulation.setDeviceMetricsOverride',{width,height:900,deviceScaleFactor:1,mobile:width<600});await sleep(180);

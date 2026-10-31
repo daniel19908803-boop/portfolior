@@ -1,10 +1,11 @@
 'use client';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
-import { ArrowUpRight, ArrowDown, ArrowUp, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, X, Settings2, Globe2, Mail, Github, Linkedin, Sparkles, Cpu, Layers3, Code2, Smartphone, ShoppingBag, Cloud, ChartNoAxesCombined, Send, CheckCheck, Copy, MapPin, Circle, Command } from 'lucide-react';
+import { ArrowUpRight, ArrowDown, ArrowUp, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, X, Settings2, Globe2, Mail, Github, Linkedin, Sparkles, Cpu, Layers3, Code2, Smartphone, ShoppingBag, Cloud, ChartNoAxesCombined, Send, CheckCheck, MapPin, Circle, Command } from 'lucide-react';
 import { copy, languages, stacks } from './content';
 import { projects, projectCopy } from './projects';
 import { siteConfig } from './site.config';
+import { contactCopy } from './contact-copy';
 
 const OceanScene = dynamic(()=>import('./OceanScene'),{ssr:false});
 const sectionIds = ['inicio','sobre','projetos','contato'];
@@ -40,12 +41,11 @@ export default function Portfolio(){
   const [sceneReady,setSceneReady]=useState(false);
   const [role,setRole]=useState(0);
   const [time,setTime]=useState('—:—');
-  const [prepared,setPrepared]=useState('');
-  const [copyState,setCopyState]=useState('');
+  const [submissionState,setSubmissionState]=useState('idle');
   const [videoError,setVideoError]=useState(false);
   const [scrolled,setScrolled]=useState(false);
   const settingsRef=useRef(null),dialogRef=useRef(null),formRef=useRef(null),lastFocus=useRef(null),heroRef=useRef(null);
-  const c={...(copy[lang]||copy['pt-BR']),...(projectCopy[lang]||projectCopy['pt-BR'])};
+  const c={...(copy[lang]||copy['pt-BR']),...(projectCopy[lang]||projectCopy['pt-BR']),...(contactCopy[lang]||contactCopy['pt-BR'])};
   const onSceneReady=useCallback(()=>setSceneReady(true),[]);
   const filtered=projects.filter(p=>!filter||p.group===filter);
   const shown=expanded?filtered:filtered.slice(0,6);
@@ -109,13 +109,23 @@ export default function Portfolio(){
   },[selected]);
 
   const chooseLanguage=value=>{setLang(value);setPanel(null);document.getElementById('language-toggle')?.focus();};
-  const prepareMessage=e=>{
-    e.preventDefault();const data=new FormData(e.currentTarget);
-    const text=`${data.get('name')} <${data.get('email')}>\n\n${data.get('message')}`;
-    setPrepared(text);setCopyState('');
-    if(siteConfig.email)window.location.href=`mailto:${siteConfig.email}?subject=${encodeURIComponent('Portfolio — '+data.get('name'))}&body=${encodeURIComponent(text)}`;
+  const sendMessage=async e=>{
+    e.preventDefault();
+    if(submissionState==='sending')return;
+    const data=new FormData(e.currentTarget);
+    setSubmissionState('sending');
+    try{
+      const response=await fetch('/contact-form.html',{
+        method:'POST',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:new URLSearchParams(data).toString(),
+      });
+      if(!response.ok)throw new Error('Form submission failed');
+      setSubmissionState('sent');
+    }catch{
+      setSubmissionState('error');
+    }
   };
-  const copyMessage=async()=>{try{await navigator.clipboard.writeText(prepared);setCopyState('copied');}catch{setCopyState('error');}};
   const changeProject=dir=>{const i=filtered.findIndex(p=>p.id===selected.id);setSelected(filtered[(i+dir+filtered.length)%filtered.length]);};
   const closeProject=()=>setSelected(null);
   const contactFromProject=()=>{closeProject();document.getElementById('contato').scrollIntoView({behavior:motion?'smooth':'instant'});setTimeout(()=>document.getElementById('contact-name')?.focus({preventScroll:true}),450);};
@@ -169,7 +179,14 @@ export default function Portfolio(){
       </div></section>
 
       <section id="contato" className="contact-section section-shell"><div className="contact-watermark" aria-hidden="true">CONTACT</div><div className="contact-glow"/><div className="section-container contact-inner"><SectionLabel number="04">{c.contactLabel}</SectionLabel><div className="contact-heading reveal"><h2>{c.contact1}<br/><span className="serif-accent">{c.contact2}</span></h2><p>{c.contactSub}</p></div>
-        <div className="contact-form-wrap reveal">{!prepared?<form ref={formRef} onSubmit={prepareMessage}><div className="form-row"><label htmlFor="contact-name">{c.fields[0]}<input id="contact-name" name="name" autoComplete="name" placeholder={c.placeholders[0]} required maxLength={100}/></label><label htmlFor="contact-email">{c.fields[1]}<input id="contact-email" name="email" type="email" autoComplete="email" placeholder={c.placeholders[1]} required maxLength={200}/></label></div><label htmlFor="contact-message">{c.fields[2]}<textarea id="contact-message" name="message" rows={5} placeholder={c.placeholders[2]} required minLength={10} maxLength={5000}/></label><div className="form-bottom"><p><span className="tiny-dot"/>{c.formNote}</p><button type="submit" className="submit-button">{c.send}<Send size={16}/></button></div></form>:<div className="prepared-message" role="status"><span className="success-icon"><Check size={24}/></span><h3>{c.prepared}</h3><p>{siteConfig.email?siteConfig.email:c.noEmail}</p><textarea readOnly value={prepared} aria-label={c.prepared} rows={5}/><div className="prepared-actions"><button className="primary-button" onClick={copyMessage}>{copyState==='copied'?c.copied:c.copy}{copyState==='copied'?<Check size={16}/>:<Copy size={16}/>}</button><button className="quiet-button" onClick={()=>setPrepared('')}>{c.back}<ArrowRight size={15}/></button></div>{copyState==='error'&&<p>{c.copyError}</p>}</div>}</div>
+        <div className="contact-form-wrap reveal">{submissionState!=='sent'?<form ref={formRef} name="contact" method="POST" action="/contact-form.html" onSubmit={sendMessage} aria-busy={submissionState==='sending'}>
+          <input type="hidden" name="form-name" value="contact"/>
+          <input type="hidden" name="subject" value="New portfolio contact message"/>
+          <label hidden>Leave this empty<input name="bot-field" tabIndex={-1} autoComplete="off"/></label>
+          <div className="form-row"><label htmlFor="contact-name">{c.fields[0]}<input id="contact-name" name="name" autoComplete="name" placeholder={c.placeholders[0]} required maxLength={100}/></label><label htmlFor="contact-email">{c.fields[1]}<input id="contact-email" name="email" type="email" autoComplete="email" placeholder={c.placeholders[1]} required maxLength={200}/></label></div><label htmlFor="contact-message">{c.fields[2]}<textarea id="contact-message" name="message" rows={5} placeholder={c.placeholders[2]} required minLength={10} maxLength={5000}/></label>
+          {submissionState==='error'&&<p className="contact-error" role="alert">{c.sendError} <a href={`mailto:${siteConfig.email}`}>{siteConfig.email}</a></p>}
+          <div className="form-bottom"><p aria-live="polite"><span className="tiny-dot"/>{submissionState==='sending'?c.sending:c.formNote}</p><button type="submit" className="submit-button" disabled={submissionState==='sending'}>{submissionState==='sending'?c.sending:c.send}<Send size={16}/></button></div>
+        </form>:<div className="prepared-message contact-success" role="status"><span className="success-icon"><Check size={24}/></span><h3>{c.sent}</h3><p>{c.sentNote}</p><div className="prepared-actions"><button className="quiet-button" onClick={()=>{setSubmissionState('idle');setTimeout(()=>document.getElementById('contact-name')?.focus({preventScroll:true}),0);}}>{c.back}<ArrowRight size={15}/></button></div></div>}</div>
       </div></section>
 
       <footer className="site-footer"><div className="section-container"><div className="footer-top"><a href="#contato" className="footer-call"><h2>{c.footer1}<br/><span>{c.footer2}</span></h2><span className="footer-arrow"><ArrowUpRight size={35}/></span></a><div className="footer-side"><Mark/><p>{c.footerNote}</p><span>GABRIEL FONSECA · {c.brazil}</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Gabriel Fonseca</span><span className="footer-project-name">My Portfolio</span><a href="#inicio" className="back-top" aria-label={c.top}><span>{c.top}</span><ArrowUp size={17}/></a></div></div></footer>
