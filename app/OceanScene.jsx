@@ -5,6 +5,7 @@ import * as THREE from 'three';
 const NAME_PARTICLE_SPACING = 10;
 const NAME_PARTICLE_SIZE = 4.8;
 const NAME_POINTER_RADIUS = 5.4;
+const NAME_LENS_STRENGTH = 1.95;
 
 export default function OceanScene({ motion, onReady }) {
   const host = useRef(null);
@@ -76,7 +77,7 @@ export default function OceanScene({ motion, onReady }) {
       const scale=worldWidth*(width<600?.91:.86)/1900;
       for(let i=0;i<count;i++){
         const tx=(targets[i][0]-1100)*scale,ty=(155-targets[i][1])*scale + worldHeight*.055;
-        const dx=tx-pointer.x,dy=ty-pointer.y,dist=Math.sqrt(dx*dx+dy*dy),force=motion ? Math.max(0,1-dist/NAME_POINTER_RADIUS)*.65 : 0;
+        const dx=tx-pointer.x,dy=ty-pointer.y,dist=Math.sqrt(dx*dx+dy*dy),force=motion ? Math.max(0,1-dist/NAME_POINTER_RADIUS)*NAME_LENS_STRENGTH : 0;
         positions[i*3]=origins[i*3]*(1-ease)+tx*ease+(dist>0?dx/dist*force:0);
         positions[i*3+1]=origins[i*3+1]*(1-ease)+ty*ease+(dist>0?dy/dist*force:0)+(motion?Math.sin(time*.7+i*.2)*.012:0);
         positions[i*3+2]=origins[i*3+2]*(1-ease)+(motion?Math.sin(time*.5+i*.15)*.11:0);
