@@ -2,6 +2,9 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
+const NAME_PARTICLE_SPACING = 10;
+const NAME_PARTICLE_SIZE = 4.8;
+
 export default function OceanScene({ motion, onReady }) {
   const host = useRef(null);
   useEffect(() => {
@@ -29,13 +32,19 @@ export default function OceanScene({ motion, onReady }) {
     ctx.fillText('Gabriel Fonseca',1100,155);
     const pixels = ctx.getImageData(0,0,2200,330).data;
     const targets = [];
-    for(let y=28;y<290;y+=4) for(let x=90;x<2110;x+=4) if(pixels[(y*2200+x)*4+3]>150) targets.push([x,y]);
+    // Larger, staggered points leave breathing room while preserving the letter shapes.
+    for(let row=0,y=28;y<290;y+=NAME_PARTICLE_SPACING,row++) {
+      const offset=row%2 ? NAME_PARTICLE_SPACING/2 : 0;
+      for(let x=90+offset;x<2110;x+=NAME_PARTICLE_SPACING) {
+        if(pixels[(y*2200+x)*4+3]>150) targets.push([x,y]);
+      }
+    }
     const count = targets.length;
     const positions = new Float32Array(count*3), origins = new Float32Array(count*3), sizes=new Float32Array(count), baseSizes=new Float32Array(count);
     for(let i=0;i<count;i++) {
       const angle=i*2.39996, r=7+Math.random()*17;
       origins[i*3]=Math.cos(angle)*r; origins[i*3+1]=Math.sin(angle)*r*.6; origins[i*3+2]=(Math.random()-.5)*15;
-      baseSizes[i]=2.3+Math.random()*.7;sizes[i]=baseSizes[i];
+      baseSizes[i]=NAME_PARTICLE_SIZE+Math.random()*.9;sizes[i]=baseSizes[i];
     }
     positions.set(origins);
     const geo=new THREE.BufferGeometry();
