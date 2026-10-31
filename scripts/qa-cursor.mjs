@@ -3,6 +3,11 @@ import { browser } from './browser.mjs';
 
 const b=await browser(9240),{call,evaluate}=b;
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+const waitFor=async expression=>{
+  const deadline=Date.now()+5000;
+  while(Date.now()<deadline){if(await evaluate(expression))return true;await pause(80);}
+  return false;
+};
 const checks=[];
 const assert=(condition,label)=>{
   if (!condition) throw new Error('FAIL: '+label);
@@ -25,6 +30,24 @@ try{
     await trail();
     assert((await pixels()).count>100,'Stars render over '+section);
   }
+  assert(await evaluate("(()=>{const opacity=Number(getComputedStyle(document.querySelector('.cursor-stars')).opacity);return opacity>0&&opacity<1;})()"),'Star clusters remain partially transparent');
+  await evaluate("document.getElementById('sobre').scrollIntoView({behavior:'instant'})");await pause(200);
+  const portrait=await evaluate("(()=>{const r=document.querySelector('.portrait-interaction').getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};})()");
+  await move(portrait.left+portrait.width*.2,portrait.top+portrait.height*.25);await pause(70);
+  const earlyTilt=await evaluate("getComputedStyle(document.querySelector('.portrait-card')).transform");
+  await pause(300);
+  assert(await evaluate("getComputedStyle(document.querySelector('.portrait-card')).transform")!==earlyTilt,'Portrait tilt eases into position with inertia');
+  assert(await waitFor("!new DOMMatrix(getComputedStyle(document.querySelector('.portrait-card')).transform).isIdentity && Number(getComputedStyle(document.querySelector('.portrait-reflection')).opacity)>.5"),'Hover adds a weighted tilt and visible light reflection');
+  const lightBefore=await evaluate("document.querySelector('.portrait-card').style.getPropertyValue('--portrait-light-x')");
+  await move(portrait.left+portrait.width*.8,portrait.top+portrait.height*.7);await pause(400);
+  assert(await evaluate("document.querySelector('.portrait-card').style.getPropertyValue('--portrait-light-x')")!==lightBefore,'Light reflection follows the pointer across the portrait');
+  const portraitShot=await call('Page.captureScreenshot',{format:'png',captureBeyondViewport:false});
+  await writeFile('.preview/portrait-reflection.png',Buffer.from(portraitShot.data,'base64'));
+  await move(1100,900);await pause(1800);
+  assert(await waitFor("new DOMMatrix(getComputedStyle(document.querySelector('.portrait-card')).transform).isIdentity && Number(getComputedStyle(document.querySelector('.portrait-reflection')).opacity)===0"),'Portrait settles flat and the reflection fades after pointer exit');
+  await evaluate("document.querySelector('.portrait-interaction').dispatchEvent(new PointerEvent('pointermove',{pointerType:'touch',clientX:300,clientY:400,bubbles:true}))");
+  assert(await evaluate("new DOMMatrix(getComputedStyle(document.querySelector('.portrait-card')).transform).isIdentity"),'Touch input leaves the portrait still');
+  await evaluate("document.getElementById('contato').scrollIntoView({behavior:'instant'})");await pause(200);
   assert(await evaluate("getComputedStyle(document.querySelector('.cursor-stars')).pointerEvents==='none'"),'Overlay cannot intercept clicks');
   const input=await evaluate("(()=>{const r=document.getElementById('contact-name').getBoundingClientRect();return {x:r.left+40,y:r.top+r.height/2};})()");
   await move(input.x,input.y);
@@ -56,11 +79,13 @@ try{
   await trail();
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'reduce'}]});await pause(150);
   await trail();assert((await pixels()).count===0,'System reduced motion disables the effect immediately');
+  assert(await evaluate("new DOMMatrix(getComputedStyle(document.querySelector('.portrait-card')).transform).isIdentity && Number(getComputedStyle(document.querySelector('.portrait-reflection')).opacity)===0"),'Reduced motion keeps the portrait and reflection still');
   await call('Emulation.setEmulatedMedia',{features:[{name:'prefers-reduced-motion',value:'no-preference'}]});
   await trail();assert((await pixels()).count>100,'Trail resumes when reduced motion is removed');
   await evaluate("document.querySelector('#settings-toggle').click()");await pause(100);
   await evaluate("document.querySelector('.switch').click();document.querySelector('.popover-heading button').click()");await pause(150);
   await trail();assert((await pixels()).count===0,'The site motion toggle disables the trail');
+  assert(await evaluate("new DOMMatrix(getComputedStyle(document.querySelector('.portrait-card')).transform).isIdentity"),'The site motion toggle leaves the portrait flat');
   assert(await evaluate("!document.querySelector('[data-cursor-lit]')"),'Disabling motion removes card highlights');
   assert(b.errors.length===0,'No uncaught browser errors');
   await writeFile('.preview/qa-cursor-result.json',JSON.stringify({passed:checks.length,checks},null,2));
