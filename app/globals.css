@@ -62,6 +62,24 @@
 @media(max-width:800px){.role-line>span{letter-spacing:1.5px}.about-principles>div{flex-wrap:wrap}.footer-top{flex-wrap:wrap}.footer-side{max-width:230px}}
 @media(max-width:700px){.hero{min-height:880px;max-height:none}.hero-topline{top:18%;gap:12px}.hero-copy{top:38%}.scene-ready .hero-copy{top:35%}.hero-subcopy{top:53%;width:calc(100% - 40px)}.hero-subcopy>p{max-width:340px}.hero-kicker{letter-spacing:1.5px}.hero-location{letter-spacing:.8px;text-align:center;padding-inline:20px}.role-line>span{letter-spacing:1px}.hero-actions{flex-wrap:wrap;gap:12px 22px}.hero-bottom{gap:12px;align-items:flex-start}.scroll-cue{letter-spacing:.6px}.local-time{flex-wrap:wrap;justify-content:flex-end;gap:6px}.local-time>span{letter-spacing:0}.main-nav>a{padding-inline:12px}.header-inner{gap:12px}.brand>span{font-size:.8125rem}.brand>span>span{font-size:.75rem}.identity-bottom>span{letter-spacing:1px}.stack-card ul{grid-template-columns:1fr}.stack-card li{font-size:.9375rem}.stack-card h3{font-size:1.125rem}.project-content h3{font-size:1.625rem}.project-description{font-size:1rem}.contact-form-wrap input,.contact-form-wrap textarea{font-size:1rem}.footer-side{max-width:100%}.footer-call h2{font-size:clamp(2.75rem,9vw,3.375rem)}.about-principles>div>span:last-child{min-width:0;flex:1}.gallery-bottom{grid-template-columns:1fr auto}.gallery-bottom>p{max-width:100%}.modal-meta{gap:14px;letter-spacing:.6px}.modal-meta>span:last-child{white-space:nowrap}}
 .cursor-stars{position:fixed;inset:0;width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:0;border:0;background:transparent;pointer-events:none!important;z-index:160;visibility:hidden}.cursor-stars[data-active]{visibility:visible}.cursor-stars::backdrop{background:transparent;pointer-events:none}.project-card{position:relative}.project-card:before,.stack-card:before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:1;background:radial-gradient(260px circle at var(--cursor-x,50%) var(--cursor-y,50%),rgba(var(--accent-rgb),.12),transparent 72%);opacity:0;transition:opacity .25s}.project-card[data-cursor-lit]:before,.stack-card[data-cursor-lit]:before{opacity:1}@media(prefers-reduced-motion:reduce){.cursor-stars{display:none}}
+/* Scroll-driven Home exit: keep layout intact while its contents disperse. */
+.hero-topline>*,.hero-copy,.hero-subcopy>.role-line,.hero-subcopy>p,.hero-actions>a,.hero-bottom>*,.hero-glow,.hero-orbit{translate:calc(var(--hero-exit,0)*var(--exit-x,0px)) calc(var(--hero-exit,0)*var(--exit-y,0px));scale:calc(1 + var(--hero-exit,0)*var(--exit-grow,1));rotate:calc(var(--hero-exit,0)*var(--exit-turn,0deg));opacity:var(--hero-exit-opacity,1)}
+.hero-topline>.availability{--exit-x:-45vw;--exit-y:-20vh;--exit-grow:1.5;--exit-turn:-12deg}
+.hero-topline>.hero-location{--exit-x:18vw;--exit-y:-30vh;--exit-grow:1.7;--exit-turn:7deg}
+.hero-topline>.hero-kicker{--exit-x:45vw;--exit-y:-16vh;--exit-grow:1.8;--exit-turn:12deg}
+.hero-copy{--exit-y:-20vh;--exit-grow:2.2}
+.hero-subcopy>.role-line{--exit-x:-48vw;--exit-y:8vh;--exit-grow:1.2;--exit-turn:-10deg}
+.hero-subcopy>p{--exit-x:46vw;--exit-y:22vh;--exit-grow:1.5;--exit-turn:8deg}
+.hero-actions>a:first-child{--exit-x:-55vw;--exit-y:35vh;--exit-grow:1.7;--exit-turn:-14deg}
+.hero-actions>a:last-child{--exit-x:55vw;--exit-y:40vh;--exit-grow:1.7;--exit-turn:14deg}
+.hero-bottom{opacity:var(--hero-exit-opacity,1)}
+.hero-bottom>*:first-child{--exit-x:-45vw;--exit-y:28vh;--exit-grow:1.4}
+.hero-bottom>.scroll-cue{--exit-x:-20vw;--exit-y:45vh;--exit-grow:1.5}
+.hero-bottom>.local-time{--exit-x:45vw;--exit-y:30vh;--exit-grow:1.4}
+.hero-orbit{--exit-grow:3;--exit-turn:20deg}.hero-glow{--exit-grow:2}
+.project-reel{scale:calc(1 + var(--hero-exit,0)*1.5);opacity:calc(.025*var(--hero-exit-opacity,1))}
+.hero[data-hero-scattering] .hero-topline>*,.hero[data-hero-scattering] .hero-copy,.hero[data-hero-scattering] .hero-subcopy>*,.hero[data-hero-scattering] .hero-actions>a{will-change:transform,opacity}
+@media(prefers-reduced-motion:reduce){.hero{--hero-exit:0!important;--hero-exit-opacity:1!important}}
 .cursor-stars{opacity:.65}
 .portrait-interaction{position:relative;perspective:1100px}
 .identity-card.portrait-card,.identity-visual:hover .portrait-card{aspect-ratio:1;transform:rotateX(var(--portrait-rx,0deg)) rotateY(var(--portrait-ry,0deg)) translateY(var(--portrait-lift,0px));box-shadow:var(--portrait-shadow-x,15px) var(--portrait-shadow-y,25px) 65px #0004,inset 0 1px 0 #ffffff07;transition:border-color .3s,box-shadow .2s}

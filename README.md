@@ -24,6 +24,7 @@ The production build exports to `out/`, which can be served by a static host. No
 
 - Three-second GF monogram introduction with circular ripples.
 - Three.js particles that assemble into Gabriel Fonseca, react to the cursor, and float above an animated ocean. A text fallback remains available without WebGL.
+- Scrolling toward About Me expands and disperses the Home content and name particles outward. The transition follows the scroll position, reverses on return, preserves normal page flow, and respects motion preferences.
 - Silent, local project showcase video behind the hero.
 - Fixed glass navigation, magnetic logo and links, and a section-aware glowing underline.
 - A flowing, theme-colored star trail follows the mouse across every section and project dialog. Project and technology cards glow at the pointer position. Effects pause when idle or hidden, ignore touch input, and respect the motion toggle and system reduced-motion preference.
@@ -64,6 +65,8 @@ The project gallery uses the supplied assets from the adjacent `ref_image/projec
 The browser checks cover the intro, Three.js, video and font loading, all eight languages, four themes, project expansion and filtering, image dialogs, contact validation, submission encoding, loading, failure and retry, section navigation, mobile settings, reduced motion, preference persistence, and overflow at widths from 320 to 1920 pixels. Contact requests are intercepted during browser QA, so checks do not send emails. Set `QA_BASE_URL` to test a preview on a different port.
 
 Run `node scripts/qa-cursor.mjs` for cursor interaction checks, including star rendering and transparency across all sections and dialogs, the portrait's weighted tilt, moving reflection and return to rest, click-through behavior, pointer-following card highlights, theme changes, idle fade-out, touch input, and motion preferences.
+
+Run `node scripts/qa-hero-scroll.mjs` to check the Home scatter transition, reverse scrolling, page flow, mobile layout, motion preferences, focus handling, and the WebGL fallback.
 
 ## Netlify deployment
 

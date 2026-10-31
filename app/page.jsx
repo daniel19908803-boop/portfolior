@@ -8,6 +8,7 @@ import { siteConfig } from './site.config';
 import { contactCopy } from './contact-copy';
 import CursorEffects from './CursorEffects';
 import PortraitCard from './PortraitCard';
+import useHeroExit from './useHeroExit';
 
 const OceanScene = dynamic(()=>import('./OceanScene'),{ssr:false});
 const sectionIds = ['inicio','sobre','projetos','contato'];
@@ -47,6 +48,7 @@ export default function Portfolio(){
   const [videoError,setVideoError]=useState(false);
   const [scrolled,setScrolled]=useState(false);
   const settingsRef=useRef(null),dialogRef=useRef(null),formRef=useRef(null),lastFocus=useRef(null),heroRef=useRef(null);
+  useHeroExit(heroRef,motion);
   const c={...(copy[lang]||copy['pt-BR']),...(projectCopy[lang]||projectCopy['pt-BR']),...(contactCopy[lang]||contactCopy['pt-BR'])};
   const onSceneReady=useCallback(()=>setSceneReady(true),[]);
   const filtered=projects.filter(p=>!filter||p.group===filter);
