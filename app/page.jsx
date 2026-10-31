@@ -6,6 +6,7 @@ import { copy, languages, stacks } from './content';
 import { projects, projectCopy } from './projects';
 import { siteConfig } from './site.config';
 import { contactCopy } from './contact-copy';
+import CursorEffects from './CursorEffects';
 
 const OceanScene = dynamic(()=>import('./OceanScene'),{ssr:false});
 const sectionIds = ['inicio','sobre','projetos','contato'];
@@ -131,6 +132,7 @@ export default function Portfolio(){
   const contactFromProject=()=>{closeProject();document.getElementById('contato').scrollIntoView({behavior:motion?'smooth':'instant'});setTimeout(()=>document.getElementById('contact-name')?.focus({preventScroll:true}),450);};
 
   return <>
+    <CursorEffects enabled={motion} overlayKey={selected?.id}/>
     <a className="skip-link" href="#main">{c.skip}</a>
     {intro&&<div className="splash" role="status" aria-label={c.loading}><div className="splash-ripple ripple-one"/><div className="splash-ripple ripple-two"/><div className="splash-ripple ripple-three"/><Mark/><span>{c.loading}</span><div className="splash-progress"/></div>}
     <header className={`site-header ${scrolled?'is-scrolled':''}`}>
