@@ -2,5 +2,6 @@ node_modules/
 .next/
 out/
 .preview/
+.netlify/
 .env*
 !.env.example

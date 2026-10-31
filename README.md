@@ -61,4 +61,26 @@ The project gallery uses the supplied assets from the adjacent `ref_image/projec
 
 The browser checks cover the intro, Three.js, video and font loading, all eight languages, four themes, project expansion and filtering, image dialogs, contact preparation, section navigation, mobile settings, reduced motion, preference persistence, and overflow at widths from 320 to 1920 pixels.
 
-The project remains local; it has not been deployed or published.
+## Netlify deployment
+
+The repository includes a pinned Netlify CLI and `netlify.toml`. Netlify builds with `npm run build` on Node.js 24 and publishes the static `out/` directory. The local `.netlify/` account/site link is ignored by Git.
+
+To connect your account and configure automatic deployments from this repository:
+
+```sh
+npx netlify login
+npm run deploy:setup
+```
+
+During setup, select or create the Netlify site for this portfolio and authorize access to `daniel19908803-boop/portfolior`. Use `main` as the production branch, `npm run build` as the build command, and `out` as the publish directory. Once connected, pushing commits to `main` automatically builds and deploys the site; Netlify manages the Git integration without a separate GitHub Actions workflow.
+
+For an on-demand draft or production deployment from this checkout:
+
+```sh
+npm run deploy:preview
+npm run deploy
+```
+
+Both commands build before uploading. To validate the Netlify build configuration without connecting an account, run `npx netlify build --offline`.
+
+See the [Netlify CLI continuous deployment guide](https://docs.netlify.com/api-and-cli-guides/cli-guides/get-started-with-cli/#continuous-deployment) for the account authorization flow.
