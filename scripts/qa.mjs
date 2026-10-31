@@ -37,13 +37,13 @@ try{
   await evaluate('document.querySelector(".more-button").click()');
   assert(await evaluate('document.querySelectorAll(".project-card").length===6'),'Show less restores six cards');
   await evaluate('document.querySelectorAll(".filters button")[3].click()');
-  assert(await evaluate('document.querySelectorAll(".project-card").length===3'),'Mobile category filter shows three relevant concepts');
+  assert(await evaluate('document.querySelectorAll(".project-card").length===2'),'Mobile category filter shows the two dating app projects');
   await evaluate('document.querySelectorAll(".filters button")[0].click()');
   await evaluate('document.querySelector(".project-open").click()');await sleep(250);
   assert(await evaluate('document.querySelector(".project-dialog").open && document.querySelector(".modal-image img").naturalWidth > 0'),'Project opens its image in a dialog');
   await shot('project-modal');
   await evaluate('document.querySelectorAll(".modal-controls button")[1].click()');
-  assert(await evaluate('document.querySelector("#project-dialog-title").textContent === "Flowstate"'),'Project dialog navigation');
+  assert(await evaluate('document.querySelector("#project-dialog-title").textContent === "Tinder Bot"'),'Project dialog navigation');
   await call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
   await sleep(100);
   assert(await evaluate('!document.querySelector(".project-dialog").open && document.body.style.overflow !== "hidden"'),'Escape closes dialog and restores scrolling');

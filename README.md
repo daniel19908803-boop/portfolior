@@ -27,20 +27,20 @@ The production build exports to `out/`, which can be served by a static host. No
 - Silent, local project showcase video behind the hero.
 - Fixed glass navigation, magnetic logo and links, and a section-aware glowing underline.
 - Separate biography and technology views, based on the supplied professional profile.
-- Portuguese, English, Spanish, Japanese, Russian, French, German, and Italian interface and biography translations. Technology names and project concept names remain proper names.
+- Portuguese, English, Spanish, Japanese, Russian, French, German, and Italian interface and biography translations. Project descriptions are available in Portuguese and English; other locales display English descriptions. Technology and project names remain proper names.
 - Four illustrated color themes, a motion toggle, and persisted local preferences. System reduced-motion preferences are respected.
-- Twenty clearly labeled project concepts, initially six visible, with category filters, show more/less, and native image dialogs with keyboard navigation.
+- Twenty projects matched in order to the seven supplied project reference screenshots, initially six visible, with category filters and show more/less. Native dialogs display the original uncropped images, with keyboard navigation and full-resolution links.
 - Responsive contact form with browser validation and a copyable message.
-- Local fonts and SVG artwork; no runtime translation service, analytics, or third-party image requests.
+- Local fonts, original project images, and optimized WebP card thumbnails; no runtime translation service, analytics, or third-party image requests.
 
-## Add real contact details and case studies
+## Contact details and project content
 
 1. Set the public email and any profile URLs in `app/site.config.js`. An empty email prepares a copyable message and clearly explains that delivery is not configured. With an email, the form opens the visitor’s email application; the visitor sends it themselves. It does not claim to send mail from the website.
-2. Replace numbered concept previews in `public/projects/01.svg` through `20.svg`. If your supplied images use JPG, PNG, or WebP, update each project’s `image` property in `app/content.js`.
-3. Update project names, descriptions, and technology tags in `app/content.js` with verified case study information. The current previews are illustrative examples of the profile’s capabilities, not fabricated client work. Keep or update their concept labels accordingly.
+2. Project images in `public/projects/01.png` through `20.png` (with original JPG/WebP extensions where applicable) match the card order in `project1.jpg` through `project7.jpg`. The Instagram Automation image is included as project 05. Cards load optimized WebP versions from `public/projects/thumbnails/`; clicking loads the original file.
+3. Update project names, descriptions, status, technology tags, and image paths in `app/projects.js`. The reference screenshots establish the project titles and their LIVE, GITHUB, or PRIVATE labels. Private source code is identified in the dialog; no project URLs are inferred from badge labels.
 4. Replace `public/project-reel.webm` with a real showcase, or regenerate it from the first six previews with `node scripts/create-reel.mjs`.
 
-The supplied reference screenshots were available as visual guidance; separate numbered project assets and public contact details were not supplied.
+The project gallery uses the supplied assets from the adjacent `ref_image/project image` folder. Public contact details remain unconfigured.
 
 ## Source map
 
@@ -49,9 +49,10 @@ The supplied reference screenshots were available as visual guidance; separate n
 | `app/page.jsx` | Layout and client-side interactions |
 | `app/OceanScene.jsx` | Three.js particle name, stars, and ocean |
 | `app/globals.css` | Tailwind entry, design, themes, and responsiveness |
-| `app/content.js` | Eight languages, project data, and technology groups |
+| `app/content.js` | Eight languages and technology groups |
+| `app/projects.js` | Twenty matched projects and translated gallery labels |
 | `app/site.config.js` | Public contact and video configuration |
-| `public/projects/` | Twenty numbered concept previews |
+| `public/projects/` | Original project images, optimized thumbnails, and legacy concept artwork used by the hero reel |
 | `public/themes/` | Four theme selection images |
 
 ## Verification

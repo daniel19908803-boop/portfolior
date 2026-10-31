@@ -2,7 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import dynamic from 'next/dynamic';
 import { ArrowUpRight, ArrowDown, ArrowUp, ArrowRight, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, Check, X, Settings2, Globe2, Mail, Github, Linkedin, Sparkles, Cpu, Layers3, Code2, Smartphone, ShoppingBag, Cloud, ChartNoAxesCombined, Send, CheckCheck, Copy, MapPin, Circle, Command } from 'lucide-react';
-import { copy, languages, projects, stacks } from './content';
+import { copy, languages, stacks } from './content';
+import { projects, projectCopy } from './projects';
 import { siteConfig } from './site.config';
 
 const OceanScene = dynamic(()=>import('./OceanScene'),{ssr:false});
@@ -44,11 +45,11 @@ export default function Portfolio(){
   const [videoError,setVideoError]=useState(false);
   const [scrolled,setScrolled]=useState(false);
   const settingsRef=useRef(null),dialogRef=useRef(null),formRef=useRef(null),lastFocus=useRef(null),heroRef=useRef(null);
-  const c=copy[lang]||copy['pt-BR'];
+  const c={...(copy[lang]||copy['pt-BR']),...(projectCopy[lang]||projectCopy['pt-BR'])};
   const onSceneReady=useCallback(()=>setSceneReady(true),[]);
   const filtered=projects.filter(p=>!filter||p.group===filter);
   const shown=expanded?filtered:filtered.slice(0,6);
-  const description=p=>lang==='pt-BR'?p.pt:lang==='en'?p.en:c.stackDescriptions[p.id===9?4:p.id===10||p.id===11||p.id===19?5:p.group===1?0:p.group===3?2:p.id===5||p.id===7||p.id===17?3:1];
+  const description=p=>lang==='pt-BR'?p.pt:p.en;
 
   useEffect(()=>{
     try{
@@ -102,7 +103,7 @@ export default function Portfolio(){
   },[panel]);
   useEffect(()=>{
     const dialog=dialogRef.current;
-    if(selected){if(!dialog.open){lastFocus.current=document.activeElement;dialog.showModal();}document.body.style.overflow='hidden';}
+    if(selected){if(!dialog.open){lastFocus.current=document.activeElement;dialog.showModal();}dialog.scrollTop=0;document.body.style.overflow='hidden';}
     else {if(dialog.open)dialog.close();document.body.style.overflow='';lastFocus.current?.focus();}
     return()=>{document.body.style.overflow='';};
   },[selected]);
@@ -162,8 +163,8 @@ export default function Portfolio(){
       </div></section>
 
       <section id="projetos" className="projects-section section-shell"><div className="section-container"><div className="projects-heading reveal"><div><SectionLabel number="03">{c.projectsLabel}</SectionLabel><h2>{c.projects1}<br/><span className="serif-accent">{c.projects2}</span></h2></div><div className="projects-intro"><span className="section-spark">✳</span><p>{c.projectsSub}</p></div></div>
-        <div className="project-toolbar"><div className="filters" role="group" aria-label={c.nav[2]}>{[c.all,...c.filters].map((label,i)=><button key={i} className={filter===i?'active':''} aria-pressed={filter===i} onClick={()=>{setFilter(i);setExpanded(false);}}>{label}{i===0&&<span>20</span>}</button>)}</div><span className="project-count">{String(filtered.length).padStart(2,'0')} {c.count}</span></div>
-        <div className="project-grid" id="project-grid">{shown.map((p,i)=><article className="project-card reveal" key={p.id} style={{'--project-accent':p.accent,'--delay':`${i%3*70}ms`}}><button className="project-open" onClick={()=>setSelected(p)} aria-label={`${c.view}: ${p.title}`}><div className="project-image"><img src={p.image} alt={`${p.title} — ${p.label}`} width="900" height="620" loading="lazy"/><span className="project-status"><i/>{c.concept}</span><span className="project-image-number">{String(p.id).padStart(2,'0')}</span><span className="project-image-action"><ArrowUpRight size={24}/></span></div><div className="project-content"><p className="project-category">{p.label}</p><h3>{p.title}<ArrowUpRight size={17}/></h3><p className="project-description">{description(p)}</p><div className="project-tags">{p.tags.map(tag=><span key={tag}>{tag}</span>)}</div><div className="project-card-bottom"><span>{c.view}</span><ArrowRight size={15}/></div></div></button></article>)}</div>
+        <div className="project-toolbar"><div className="filters" role="group" aria-label={c.nav[2]}>{[c.all,...c.filters].map((label,i)=><button key={i} className={filter===i?'active':''} aria-pressed={filter===i} onClick={()=>{setFilter(i);setExpanded(false);}}>{label}{i===0&&<span>{projects.length}</span>}</button>)}</div><span className="project-count">{String(filtered.length).padStart(2,'0')} {c.count}</span></div>
+        <div className="project-grid" id="project-grid">{shown.map((p,i)=><article className="project-card reveal" key={p.id} style={{'--project-accent':p.accent,'--delay':`${i%3*70}ms`}}><button className="project-open" onClick={()=>setSelected(p)} aria-label={`${c.view}: ${p.title}`}><div className="project-image"><img src={p.thumbnail} alt={`${p.title} — ${p.label}`} width="900" height="620" loading="lazy"/><span className={`project-status status-${p.status}`}><i/>{c.statuses[p.status]}</span><span className="project-image-number">{String(p.id).padStart(2,'0')}</span><span className="project-image-action"><ArrowUpRight size={24}/></span></div><div className="project-content"><p className="project-category">{p.label}</p><h3>{p.title}<ArrowUpRight size={17}/></h3><p className="project-description">{description(p)}</p><div className="project-tags">{p.tags.map(tag=><span key={tag}>{tag}</span>)}</div><div className="project-card-bottom"><span>{c.view}</span><ArrowRight size={15}/></div></div></button></article>)}</div>
         <div className="gallery-bottom"><p><Circle size={6}/>{c.galleryNote}</p>{filtered.length>6&&<button className="more-button" aria-expanded={expanded} aria-controls="project-grid" onClick={()=>{if(expanded){document.getElementById('projetos').scrollIntoView({behavior:'instant'});}setExpanded(!expanded);}}>{expanded?c.less:c.more}<span>{expanded?<ChevronUp size={16}/>:<ChevronDown size={16}/>}</span></button>}<span className="gallery-range">{String(shown.length).padStart(2,'0')} / {String(filtered.length).padStart(2,'0')}</span></div>
       </div></section>
 
@@ -174,7 +175,7 @@ export default function Portfolio(){
       <footer className="site-footer"><div className="section-container"><div className="footer-top"><a href="#contato" className="footer-call"><h2>{c.footer1}<br/><span>{c.footer2}</span></h2><span className="footer-arrow"><ArrowUpRight size={35}/></span></a><div className="footer-side"><Mark/><p>{c.footerNote}</p><span>GABRIEL FONSECA · {c.brazil}</span></div></div><div className="footer-bottom"><span>© {new Date().getFullYear()} Gabriel Fonseca</span><span className="footer-project-name">My Portfolio</span><a href="#inicio" className="back-top" aria-label={c.top}><span>{c.top}</span><ArrowUp size={17}/></a></div></div></footer>
     </main>
     <dialog className="project-dialog" ref={dialogRef} onCancel={e=>{e.preventDefault();closeProject();}} onClick={e=>{if(e.target===e.currentTarget)closeProject();}} onKeyDown={e=>{if(e.key==='ArrowRight')changeProject(1);if(e.key==='ArrowLeft')changeProject(-1);}} aria-labelledby="project-dialog-title">
-      {selected&&<><button className="modal-close" aria-label={c.close} onClick={closeProject}><X size={20}/></button><div className="modal-image"><img src={selected.image} alt={`${selected.title} — ${selected.label}`}/></div><div className="modal-content"><div className="modal-meta"><span>{c.caseLabel}</span><span>{String(selected.id).padStart(2,'0')} / 20</span></div><h2 id="project-dialog-title">{selected.title}</h2><p className="modal-description">{description(selected)}</p><p className="modal-scope">{c.scope}</p><div className="project-tags">{selected.tags.map(tag=><span key={tag}>{tag}</span>)}</div><p className="concept-note">{c.caseBody}</p><div className="modal-bottom"><button className="text-link" onClick={contactFromProject}>{c.related}<ArrowUpRight size={17}/></button><div className="modal-controls"><button onClick={()=>changeProject(-1)} aria-label="Previous"><ChevronLeft size={20}/></button><button onClick={()=>changeProject(1)} aria-label="Next"><ChevronRight size={20}/></button></div></div></div></>}
+      {selected&&<><button className="modal-close" aria-label={c.close} onClick={closeProject}><X size={20}/></button><div className="modal-image"><a href={selected.image} target="_blank" rel="noreferrer" aria-label={`${c.fullImage}: ${selected.title}`}><img key={selected.id} src={selected.image} alt={`${selected.title} — ${selected.label}`}/></a></div><div className="modal-content"><div className="modal-meta"><span>{c.caseLabel}</span><span>{String(projects.findIndex(p=>p.id===selected.id)+1).padStart(2,'0')} / {projects.length}</span></div><h2 id="project-dialog-title">{selected.title}</h2><p className="modal-description">{description(selected)}</p><p className="modal-scope">{c.scope}</p><div className="project-tags">{selected.tags.map(tag=><span key={tag}>{tag}</span>)}</div><a className="modal-full-image text-link" href={selected.image} target="_blank" rel="noreferrer">{c.fullImage}<ArrowUpRight size={16}/></a>{selected.status==='private'&&<p className="project-private-note">{c.privateNote}</p>}<div className="modal-bottom"><button className="text-link" onClick={contactFromProject}>{c.related}<ArrowUpRight size={17}/></button><div className="modal-controls"><button onClick={()=>changeProject(-1)} aria-label={c.previousProject}><ChevronLeft size={20}/></button><button onClick={()=>changeProject(1)} aria-label={c.nextProject}><ChevronRight size={20}/></button></div></div></div></>}
     </dialog>
   </>;
 }
