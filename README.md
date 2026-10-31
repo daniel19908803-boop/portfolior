@@ -65,14 +65,16 @@ The browser checks cover the intro, Three.js, video and font loading, all eight 
 
 The repository includes a pinned Netlify CLI and `netlify.toml`. Netlify builds with `npm run build` on Node.js 24 and publishes the static `out/` directory. The local `.netlify/` account/site link is ignored by Git.
 
-To connect your account and configure automatic deployments from this repository:
+Netlify project: [gabriel-fonseca-portfolio](https://gabriel-fonseca-portfolio.netlify.app). The connected repository is `daniel19908803-boop/portfolior`, with `main` as the production branch.
+
+To connect a fresh local checkout to this existing project:
 
 ```sh
 npx netlify login
-npm run deploy:setup
+npx netlify link --id 5b896c8f-5fd5-4e9a-911c-ee414389d9aa
 ```
 
-During setup, select or create the Netlify site for this portfolio and authorize access to `daniel19908803-boop/portfolior`. Use `main` as the production branch, `npm run build` as the build command, and `out` as the publish directory. Once connected, pushing commits to `main` automatically builds and deploys the site; Netlify manages the Git integration without a separate GitHub Actions workflow.
+Pushing commits to `main` automatically builds and deploys the site; Netlify manages the Git integration without a separate GitHub Actions workflow. Build settings are versioned in `netlify.toml`. Use `npm run deploy:setup` only when configuring a new project or repairing its Git integration.
 
 For an on-demand draft or production deployment from this checkout:
 
